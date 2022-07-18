@@ -83,7 +83,7 @@ sudo apt install build-essential curl file git
 
 ### 3.2. Homebrew本体のインストール
 
-[Homebrewのトップページ](https://brew.sh/index_ja)からコピーする。  
+[Homebrewのトップページ](https://brew.sh/index_ja)から最新をコピーする。  
 
 ```ターミナル(Debian)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -91,13 +91,11 @@ sudo apt install build-essential curl file git
 
 ### 3.3. Homebrewの初期設定
 
-#### 1) パスを通してコマンドを使えるようにする  
+#### 1) パスを追加し、コマンドを使えるようにする  
 
 ```ターミナル(Debian)
-test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+echo 'export LD_LIBRARY_PATH=/home/linuxbrew/.linuxbrew/lib:$LD_LIBRARY_PATH' >> /home/[ユーザ名]/.profile
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/[ユーザ名]/.profile
 ```
 
 #### 2) 設定を反映させるために、シェルの再起動
@@ -130,7 +128,13 @@ brew doctor
 Your system is ready to brew.
 ```
 
-#### 5) slのインストールと実行(任意)
+#### 5) GCCのインストール(任意)
+
+```ターミナル(Debian)
+brew install gcc 
+```
+
+#### 6) slのインストールと実行(任意)
 
 slが走れば問題なし。  
 
@@ -147,11 +151,10 @@ sl
 brew install rbenv
 ```
 
-### 4.2. パス設定と初期化処理を.profileに追加
+### 4.2. 初期化処理を.profileに追加
 
 ```ターミナル(Debian)
-echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> /home/[ユーザ名]/.profile
 ```
 
 ### 4.3. 設定を反映させるために、シェルの再起動
@@ -172,24 +175,15 @@ rbenv -v
 rbenv 1.2.0
 ```
 
-### 4.5. ruby-buildのインストール(rbenvでRubyのインストールを簡単にするプラグイン)
-
-```ターミナル(Debian)
-git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
-```
-
-### 4.6. Rubyのインストールのために必要なパッケージのインストール
-
-Homebrewをインストールしても、これらのパッケージはRubyのビルドには必要。  
-また、[rbenv/ruby-build](https://github.com/rbenv/ruby-build/wiki#suggested-build-environment/) の内容に加え、`ruby-dev curl` も追加(インストールしないと、何故か gem のインストールでエラーが発生する)。  
-
-```ターミナル(Debian)
-sudo apt install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev ruby-dev curl
-```
-
 ### 4.5. Rubyのインストール
 
-#### 1) Rubyのインストール(2.5.1を指定)
+#### 1) Rubyのインストールのために必要なパッケージのインストール
+
+```ターミナル(Debian)
+sudo apt-get install -y zlib1g-dev
+```
+
+#### 2) Rubyのインストール(2.5.1を指定)
 
 ```ターミナル(Debian)
 rbenv install 2.5.1
@@ -201,7 +195,7 @@ rbenv install 2.5.1
 rbenv install --list
 ```
 
-#### 2) rbenv rehash の実行
+#### 3) rbenv rehash の実行
 
 別のバージョンのRubyを追加したり、コマンドを提供するgemを追加した場合は、`rbenv rehash`の実行が必要。  
 
@@ -209,18 +203,13 @@ rbenv install --list
 rbenv rehash
 ```
 
-※参考  
-
-- [WindowsでWSL、Ubuntu、Rubyをインストール](https://qiita.com/tsukamoto/items/6e9a181b6e0defc27a39)
-- [rbenv rehashをちゃんと理解する](https://mogulla3.tech/articles/2020-12-29-01))
-
-#### 3) デフォルトで使用するRubyのバージョンを明示的に指定
+#### 4) デフォルトで使用するRubyのバージョンを明示的に指定
 
 ```ターミナル(Debian)
 rbenv global 2.5.1
 ```
 
-#### 4) Rubyのバージョンの確認
+#### 5) Rubyのバージョンの確認
 
 ```ターミナル(Debian)
 ruby -v
@@ -232,7 +221,7 @@ ruby -v
 ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-linux]
 ```
 
-#### 5) 実行コマンドのフルパスの確認
+#### 6) 実行コマンドのフルパスの確認
 
 ```ターミナル(Debian)
 which ruby
@@ -261,7 +250,7 @@ gem -v
 確認結果
 
 ```ターミナル(Debian)
-3.3.17
+3.3.18
 ```
 
 ### 4.7. Bundlerのインストール
@@ -269,22 +258,10 @@ gem -v
 #### 1) Bundlerのインストール
 
 ```ターミナル(Debian)
-sudo gem install bundler
+gem install bundler
 ```
 
-`sudo` を付けないと、次のエラーが発生する。
-
-```
-While executing gem ... (Gem::FilePermissionError)
-```
-
-エラーが発生する場合は、`sudo` を使用せず、次のように、`--user` でも可  
-
-```ターミナル(Debian)
-gem install --user bundler
-```
-
-※参考　よく使うコマンド(詳細はテキスト参照)
+※よく使うコマンド(詳細はテキスト参照)
 
 - `bundler install xxx`
 - `bundler exe [コマンド]`
@@ -303,17 +280,15 @@ gem list
 *** LOCAL GEMS ***
 
 bigdecimal (default: 1.3.4)
-bundler (default: 2.3.17)
+bundler (2.3.18)
 cmath (default: 1.0.0)
 csv (default: 1.0.0)
 date (default: 1.0.0)
-dbm (default: 1.0.0)
 did_you_mean (1.2.0)
 etc (default: 1.0.0)
 fcntl (default: 1.0.0)
 fiddle (default: 1.0.0)
 fileutils (default: 1.0.2)
-gdbm (default: 2.0.0)
 io-console (default: 0.4.6)
 ipaddr (default: 1.2.0)
 json (default: 2.1.0)
@@ -324,7 +299,7 @@ power_assert (1.1.1)
 psych (default: 3.0.2)
 rake (12.3.0)
 rdoc (default: 6.0.1)
-rubygems-update (3.3.17)
+rubygems-update (3.3.18)
 scanf (default: 1.0.0)
 sdbm (default: 1.0.0)
 stringio (default: 0.0.1)
@@ -340,7 +315,7 @@ zlib (default: 1.0.0)
 #### 1) Rails のgemは **5.2.6** をインストールする
 
 ```ターミナル(Debian)
-sudo gem install rails -v 5.2.6
+gem install rails -v 5.2.6
 ```
 
 #### 2) Rails のバージョン確認
@@ -366,8 +341,8 @@ brew install node
 #### 1) solargrapfとrubocopのインストール
 
 ```ターミナル(Debian)
-sudo gem install solargraph
-sudo gem install rubocop
+gem install solargraph
+gem install rubocop
 ```
 
 #### 2) ruby-debug-ide のインストール
@@ -375,7 +350,7 @@ sudo gem install rubocop
 これをインストールしないとステップ実行ができない。  
 
 ```ターミナル(Debian)
-sudo gem install ruby-debug-ide
+gem install ruby-debug-ide
 ```
 
 #### 3) launch.jsonの作成・修正
@@ -402,7 +377,14 @@ sudo gem install ruby-debug-ide
 - [WSLを利用したLinux環境の構築](https://amorphous.tf.chiba-u.jp/memo.files/wsl/wsl_linux.html#orge81da1d)
 - [Ruby開発環境の構築](https://www.koeki-prj.org/~akito/it/rubyenv/rubyenv.html)
 - [Windows内のLinux環境を手軽に初期化、WSL2の賢い操作法](https://xtech.nikkei.com/atcl/nxt/column/18/01863/112600004/)
+- [WindowsでWSL、Ubuntu、Rubyをインストール](https://qiita.com/tsukamoto/items/6e9a181b6e0defc27a39)
+- [rbenv rehashをちゃんと理解する](https://mogulla3.tech/articles/2020-12-29-01))
 - [今更ながら重い腰を上げてWSL2へHomebrewをインストールした](https://zenn.dev/ryuu/articles/wsl2-homebrew)
 - [WSL(Ubuntu 18.04)でHomebrewを使う](https://tech-blog.cloud-config.jp/2019-07-19-homebrew-on-wsl/)
 - [VS CodeでRubyで書かれたプログラムを簡単デバッグ](https://ottan.jp/posts/2020/05/ruby-vscode-debug/)
 - [VSCode:Rubyデバッグできない。環境、構成をつくりなおす、gemのアンインストールなど](https://pagetaka.hatenablog.jp/entry/2019/10/02/151215)
+- [[-bash: rbenv: コマンドが見つかりません]aws(ec2)上のrbenvの初期設定エラーの解決方法](https://qiita.com/KONTA2019/items/e966d4b106d981faef52)
+- [LinuxでHomebrewを使う: Homebrew-fileも対応させた](https://rcmdnk.com/blog/2019/02/27/computer-linux-homebrew/)
+- [Linuxbrew改めHomebrew@Linuxでrelocation errorに対する対処法](https://rcmdnk.com/blog/2019/05/08/computer-linux-homebrew/gg)
+- [Multiple glibc libraries on a single host](https://stackoverflow.com/questions/847179/multiple-glibc-libraries-on-a-single-host)
+- [Linuxbrew で入れた Go でビルドしたバイナリは可搬性が無い](https://note.sarisia.cc/entry/linuxbrew-go/)
