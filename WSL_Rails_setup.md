@@ -4,7 +4,7 @@
 
 ### 1.1. ターミナル(cmdまたはpower shell)から、次のコマンドでインストールする
 
-```ターミナル(Windows)
+```PowerShell
 wsl --install -d Debian
 ```
 
@@ -12,13 +12,13 @@ wsl --install -d Debian
 
 ### 1.3. バージョンが古い場合があるため、次のコマンドでバージョンを確認する
 
-```ターミナル(Debian)
+```bash
 cat /etc/os-release
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 NAME="Debian GNU/Linux"
 VERSION_ID="11"
@@ -34,13 +34,13 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 
 ### 1.4. 念のため、WSLのバージョンも確認する
 
-```ターミナル(Windows)
+```PowerShell
 wsl -l -v
 ```
 
 確認結果
 
-```ターミナル(Windows)
+```PowerShell
   NAME      STATE           VERSION
 * Debian    Running         2
 ```
@@ -50,7 +50,7 @@ wsl -l -v
 
 ※参考 WSLのインストール先
 
-```WSLのインストール先
+```PowerShell
 C:\Users\[ユーザ名]\AppData\Local\Packages\TheDebianProject.DebianGNULinux_76v4gfsz19hv4
 ```
 
@@ -58,7 +58,7 @@ C:\Users\[ユーザ名]\AppData\Local\Packages\TheDebianProject.DebianGNULinux_7
 
 ### 2.1. package情報の更新
 
-```ターミナル(Debian)
+```bash
 sudo apt update
 sudo apt upgrade -y
 ```
@@ -69,7 +69,7 @@ sudo apt upgrade -y
 Locales to be generated: は、**ja_JP.UTF-8 UTF-8** をスペースキーで選択し、エンターキーを押し、  
 Default locale for the system environment: は、**ja_JP.UTF-8** を選択し、再びエンターキーを押す。
 
-```ターミナル(Debian)
+```bash
 sudo dpkg-reconfigure locales
 ```
 
@@ -77,7 +77,7 @@ sudo dpkg-reconfigure locales
 
 ### 3.1. 必要なパッケージのインストール
 
-```ターミナル(Debian)
+```bash
 sudo apt install build-essential curl file git
 ```
 
@@ -85,7 +85,7 @@ sudo apt install build-essential curl file git
 
 [Homebrewのトップページ](https://brew.sh/index_ja)から最新をコピーする。  
 
-```ターミナル(Debian)
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
@@ -93,44 +93,56 @@ sudo apt install build-essential curl file git
 
 #### 1) パスを追加し、コマンドを使えるようにする  
 
-```ターミナル(Debian)
-echo 'export LD_LIBRARY_PATH=/home/linuxbrew/.linuxbrew/lib:$LD_LIBRARY_PATH' >> /home/[ユーザ名]/.profile
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/[ユーザ名]/.profile
+```bash
+echo 'export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/home/linuxbrew/.linuxbrew/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
+```
+
+**※LD_LIBRARY_PATH を設定しないと、以下のエラーが発生する**
+
+```bash
+bin/rails s
+
+>libffi.so.8: cannot open shared object file: 
+>No such file or directory - 
+>/home/[ユーザ名]/.rbenv/versions/2.5.1/lib/ruby/gems/2.5.0/gems/ffi-1.15.5/lib/ffi_c.so (LoadError)
 ```
 
 #### 2) 設定を反映させるために、シェルの再起動
 
-```ターミナル(Debian)
+```bash
 exec $SHELL -l
 ```
 
 #### 3) バージョンの確認
 
-```ターミナル(Debian)
+```bash
 brew --version
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 Homebrew 3.5.4
 ```
 
 #### 4) brew doctorの実行
 
-```ターミナル(Debian)
+```bash
 brew doctor
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 Your system is ready to brew.
 ```
 
 #### 5) GCCのインストール(任意)
 
-```ターミナル(Debian)
+```bash
 brew install gcc 
 ```
 
@@ -138,7 +150,7 @@ brew install gcc
 
 slが走れば問題なし。  
 
-```ターミナル(Debian)
+```bash
 brew install sl
 sl
 ```
@@ -147,31 +159,31 @@ sl
 
 ### 4.1. rbenvのインストール
 
-```ターミナル(Debian)
+```bash
 brew install rbenv
 ```
 
-### 4.2. 初期化処理を.profileに追加
+### 4.2. 初期化処理を .bashrc に追加
 
-```ターミナル(Debian)
-echo 'eval "$(rbenv init -)"' >> /home/[ユーザ名]/.profile
+```bash
+echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
 ```
 
 ### 4.3. 設定を反映させるために、シェルの再起動
 
-```ターミナル(Debian)
+```bash
 exec $SHELL -l
 ```
 
 ### 4.4. バージョンの確認
 
-```ターミナル(Debian)
+```bash
 rbenv -v
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 rbenv 1.2.0
 ```
 
@@ -179,19 +191,19 @@ rbenv 1.2.0
 
 #### 1) Rubyのインストールのために必要なパッケージのインストール
 
-```ターミナル(Debian)
+```bash
 sudo apt-get install -y zlib1g-dev
 ```
 
 #### 2) Rubyのインストール(2.5.1を指定)
 
-```ターミナル(Debian)
+```bash
 rbenv install 2.5.1
 ```
 
 ※参考 インストールができるrubyのバージョンの確認コマンド  
 
-```ターミナル(Debian)
+```bash
 rbenv install --list
 ```
 
@@ -199,37 +211,37 @@ rbenv install --list
 
 別のバージョンのRubyを追加したり、コマンドを提供するgemを追加した場合は、`rbenv rehash`の実行が必要。  
 
-```ターミナル(Debian)
+```bash
 rbenv rehash
 ```
 
 #### 4) デフォルトで使用するRubyのバージョンを明示的に指定
 
-```ターミナル(Debian)
+```bash
 rbenv global 2.5.1
 ```
 
 #### 5) Rubyのバージョンの確認
 
-```ターミナル(Debian)
+```bash
 ruby -v
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-linux]
 ```
 
 #### 6) 実行コマンドのフルパスの確認
 
-```ターミナル(Debian)
+```bash
 which ruby
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 /home/[ユーザ名]/.rbenv/shims/ruby
 ```
 
@@ -237,19 +249,19 @@ which ruby
 
 #### 1) RubyGemsのインストール
 
-```ターミナル(Debian)
+```bash
 gem update --system
 ```
 
 #### 2) RubyGemsのバージョン確認
 
-```ターミナル(Debian)
+```bash
 gem -v
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 3.3.18
 ```
 
@@ -257,26 +269,29 @@ gem -v
 
 #### 1) Bundlerのインストール
 
-```ターミナル(Debian)
+```bash
 gem install bundler
 ```
 
-※よく使うコマンド(詳細はテキスト参照)
+<details>
+<summary>よく使うコマンド(詳細はテキスト参照)</summary>
 
 - `bundler install xxx`
 - `bundler exe [コマンド]`
 - `bundler init`
 - `bundler update`
 
+</details>
+
 #### 2) gemの一覧を表示し、Bundlerのバージョンを確認する
 
-```ターミナル(Debian)
+```bash
 gem list
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 *** LOCAL GEMS ***
 
 bigdecimal (default: 1.3.4)
@@ -314,25 +329,25 @@ zlib (default: 1.0.0)
 
 #### 1) Rails のgemは **5.2.6** をインストールする
 
-```ターミナル(Debian)
+```bash
 gem install rails -v 5.2.6
 ```
 
 #### 2) Rails のバージョン確認
 
-```ターミナル(Debian)
+```bash
 rails -v
 ```
 
 確認結果
 
-```ターミナル(Debian)
+```bash
 Rails 5.2.6
 ```
 
 #### 3) Node.js のインストール
 
-```ターミナル(Debian)
+```bash
 brew install node
 ```
 
@@ -340,7 +355,7 @@ brew install node
 
 #### 1) solargrapfとrubocopのインストール
 
-```ターミナル(Debian)
+```bash
 gem install solargraph
 gem install rubocop
 ```
@@ -349,7 +364,7 @@ gem install rubocop
 
 これをインストールしないとステップ実行ができない。  
 
-```ターミナル(Debian)
+```bash
 gem install ruby-debug-ide
 ```
 
@@ -357,7 +372,7 @@ gem install ruby-debug-ide
 
 開いているファイルを、F5キーでデバッグ開始する設定。  
 
-```json
+```JSON
 {
     "version": "0.2.0",
     "configurations": [
